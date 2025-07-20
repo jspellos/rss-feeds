@@ -20,64 +20,65 @@
             --success-color: #10b981;
             --warning-color: #f59e0b;
             --error-color: #ef4444;
-            --background: #f8fafc;
+            --background: #f1f5f9;
             --surface: #ffffff;
-            --surface-hover: #f1f5f9;
+            --surface-hover: #f8fafc;
             --text-primary: #1e293b;
             --text-secondary: #64748b;
             --text-muted: #94a3b8;
             --border: #e2e8f0;
+            --border-light: #f1f5f9;
             --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-            --radius-sm: 6px;
-            --radius-md: 8px;
-            --radius-lg: 12px;
-            --radius-xl: 16px;
+            --shadow-md: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --radius-sm: 4px;
+            --radius-md: 6px;
+            --radius-lg: 8px;
+            --radius-xl: 12px;
         }
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: var(--background);
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
             color: var(--text-primary);
-            line-height: 1.6;
+            line-height: 1.5;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
+            min-height: 100vh;
         }
 
         .container {
-            max-width: 1400px;
+            max-width: 1200px;
             margin: 0 auto;
-            padding: 24px;
+            padding: 20px;
         }
 
         .header {
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 32px;
         }
 
         .header h1 {
             font-size: 2.5rem;
             font-weight: 700;
-            color: var(--text-primary);
-            margin-bottom: 8px;
             background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            margin-bottom: 8px;
         }
 
         .header p {
-            font-size: 1.1rem;
+            font-size: 1rem;
             color: var(--text-secondary);
             font-weight: 400;
         }
 
         .input-section {
             background: var(--surface);
-            padding: 32px;
+            padding: 24px;
             border-radius: var(--radius-xl);
-            margin-bottom: 40px;
+            margin-bottom: 32px;
             box-shadow: var(--shadow-lg);
             border: 1px solid var(--border);
         }
@@ -85,16 +86,16 @@
         .input-group {
             display: flex;
             gap: 12px;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
             flex-wrap: wrap;
         }
 
         input[type="url"] {
             flex: 1;
-            padding: 16px 20px;
+            padding: 12px 16px;
             border: 2px solid var(--border);
             border-radius: var(--radius-lg);
-            font-size: 16px;
+            font-size: 14px;
             min-width: 300px;
             background: var(--surface);
             color: var(--text-primary);
@@ -113,23 +114,23 @@
         }
 
         .btn {
-            padding: 16px 28px;
+            padding: 12px 24px;
             border: none;
             border-radius: var(--radius-lg);
             cursor: pointer;
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 600;
             transition: all 0.2s ease;
             font-family: inherit;
             display: inline-flex;
             align-items: center;
             gap: 8px;
+            box-shadow: var(--shadow-md);
         }
 
         .btn-primary {
             background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
             color: white;
-            box-shadow: var(--shadow-md);
         }
 
         .btn-primary:hover:not(:disabled) {
@@ -143,14 +144,25 @@
             transform: none;
         }
 
+        .btn-secondary {
+            background: var(--surface);
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--surface-hover);
+            color: var(--text-primary);
+        }
+
         .saved-feeds {
-            margin-bottom: 24px;
+            margin-bottom: 20px;
         }
 
         .saved-feeds h3 {
-            margin-bottom: 16px;
+            margin-bottom: 12px;
             color: var(--text-secondary);
-            font-size: 1rem;
+            font-size: 0.875rem;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.05em;
@@ -160,13 +172,13 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            padding: 10px 16px;
+            padding: 8px 14px;
             background: linear-gradient(135deg, #e0f2fe, #e1f5fe);
-            border: 1px solid #0891b2;
-            border-radius: 24px;
+            border: 1px solid var(--accent-color);
+            border-radius: 20px;
             margin: 4px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 500;
             transition: all 0.2s ease;
             color: #0c4a6e;
@@ -185,10 +197,10 @@
             color: inherit;
             cursor: pointer;
             padding: 0;
-            font-size: 18px;
+            font-size: 16px;
             line-height: 1;
-            width: 20px;
-            height: 20px;
+            width: 16px;
+            height: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -202,36 +214,144 @@
 
         .quick-feeds {
             display: flex;
-            gap: 12px;
+            gap: 8px;
             flex-wrap: wrap;
         }
 
         .quick-feed {
-            padding: 12px 20px;
-            background: var(--surface-hover);
-            border: 1px solid var(--border);
-            border-radius: 24px;
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #fef3c7, #fbbf24);
+            border: 1px solid var(--warning-color);
+            border-radius: 20px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 500;
             transition: all 0.2s ease;
-            color: var(--text-secondary);
+            color: #92400e;
         }
 
         .quick-feed:hover {
-            background: var(--primary-color);
+            background: linear-gradient(135deg, var(--warning-color), #d97706);
             color: white;
             transform: translateY(-1px);
             box-shadow: var(--shadow-md);
         }
 
+        /* Latest News Section */
+        .latest-news-section {
+            background: var(--surface);
+            border-radius: var(--radius-xl);
+            margin-bottom: 32px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        .latest-news-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+        }
+
+        .latest-news-header h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: white;
+            margin: 0;
+        }
+
+        .latest-news-items {
+            padding: 0;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+        }
+
+        .latest-news-item {
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border-light);
+            transition: background 0.2s ease;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .latest-news-item:nth-child(odd) {
+            border-right: 1px solid var(--border-light);
+        }
+
+        .latest-news-item:hover {
+            background: var(--surface-hover);
+        }
+
+        .latest-news-item:nth-last-child(-n+2) {
+            border-bottom: none;
+        }
+
+        .latest-news-thumbnail {
+            width: 60px;
+            height: 60px;
+            background: var(--background);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            flex-shrink: 0;
+            border: 2px solid var(--border);
+        }
+
+        .latest-news-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .latest-news-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .latest-news-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            text-decoration: none;
+            display: block;
+            margin-bottom: 6px;
+            line-height: 1.4;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+
+        .latest-news-title:hover {
+            color: var(--primary-color);
+        }
+
+        .latest-news-meta {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+
+        .latest-news-source {
+            color: var(--accent-color);
+            font-weight: 600;
+            background: rgba(14, 165, 233, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+        }
+
         .loading {
             text-align: center;
-            padding: 60px 20px;
+            padding: 40px 20px;
             color: var(--text-secondary);
             background: var(--surface);
             border-radius: var(--radius-xl);
-            box-shadow: var(--shadow-md);
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border);
         }
 
         .loading::before {
@@ -253,12 +373,13 @@
         .error {
             background: linear-gradient(135deg, #fef2f2, #fee2e2);
             color: var(--error-color);
-            padding: 20px 24px;
-            border-radius: var(--radius-lg);
-            margin-bottom: 24px;
-            border-left: 4px solid var(--error-color);
-            box-shadow: var(--shadow-sm);
+            padding: 16px 20px;
+            border-radius: var(--radius-xl);
+            margin-bottom: 20px;
+            border: 2px solid #fecaca;
+            font-size: 14px;
             font-weight: 500;
+            box-shadow: var(--shadow-md);
         }
 
         .feeds-container {
@@ -291,7 +412,7 @@
             }
             
             .input-section {
-                padding: 24px;
+                padding: 20px;
             }
             
             .input-group {
@@ -304,6 +425,23 @@
             
             .header h1 {
                 font-size: 2rem;
+            }
+
+            .latest-news-items {
+                grid-template-columns: 1fr;
+            }
+
+            .latest-news-item:nth-child(odd) {
+                border-right: none;
+            }
+
+            .latest-news-item {
+                flex-direction: column;
+            }
+
+            .latest-news-thumbnail {
+                width: 100%;
+                height: 120px;
             }
         }
 
@@ -318,72 +456,88 @@
 
         .feed-section:hover {
             transform: translateY(-2px);
-            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            box-shadow: 0 10px 25px -3px rgb(0 0 0 / 0.1), 0 4px 6px -2px rgb(0 0 0 / 0.05);
         }
 
         .feed-header {
-            padding: 24px;
-            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-            color: white;
+            padding: 16px 20px;
+            background: linear-gradient(135deg, var(--success-color), #059669);
+            border-bottom: 1px solid var(--border);
             position: relative;
-            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
 
-        .feed-header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.05' fill-rule='evenodd'%3E%3Ccircle cx='3' cy='3' r='3'/%3E%3Ccircle cx='13' cy='13' r='3'/%3E%3C/g%3E%3C/svg%3E");
-            pointer-events: none;
+        .feed-header.youtube-header {
+            background: linear-gradient(135deg, #ff0000, #cc0000);
         }
 
-        .feed-header-content {
-            position: relative;
-            z-index: 1;
+        .feed-header-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
         }
 
         .feed-title {
-            font-size: 1.25rem;
-            font-weight: 700;
-            margin-bottom: 8px;
-            line-height: 1.3;
+            font-size: 1rem;
+            font-weight: 600;
+            color: white;
+            margin: 0;
+        }
+
+        .feed-title-input {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            border: 2px solid var(--primary-color);
+            background: var(--surface);
+            padding: 4px 8px;
+            border-radius: var(--radius-md);
+            min-width: 120px;
+        }
+
+        .feed-title-input:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgb(37 99 235 / 0.1);
         }
 
         .feed-type {
             display: inline-block;
-            padding: 6px 14px;
+            padding: 4px 10px;
             background: rgba(255, 255, 255, 0.2);
-            border-radius: 20px;
-            font-size: 12px;
+            border-radius: var(--radius-md);
+            font-size: 11px;
             text-transform: uppercase;
             font-weight: 600;
             letter-spacing: 0.05em;
+            color: white;
             backdrop-filter: blur(10px);
         }
 
         .youtube-type {
-            background: linear-gradient(135deg, #ff0000, #cc0000);
+            background: rgba(255, 255, 255, 0.2);
         }
 
         .rss-type {
-            background: linear-gradient(135deg, #10b981, #059669);
+            background: rgba(255, 255, 255, 0.2);
         }
 
-        .feed-close {
-            position: absolute;
-            top: 20px;
-            right: 20px;
+        .feed-actions {
+            display: flex;
+            gap: 4px;
+        }
+
+        .feed-edit-btn, .feed-close {
             background: rgba(255, 255, 255, 0.2);
             border: none;
             color: white;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius-md);
             cursor: pointer;
-            font-size: 18px;
+            font-size: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -391,19 +545,19 @@
             backdrop-filter: blur(10px);
         }
 
-        .feed-close:hover {
+        .feed-edit-btn:hover, .feed-close:hover {
             background: rgba(255, 255, 255, 0.3);
-            transform: scale(1.1);
+            transform: scale(1.05);
         }
 
         .feed-items {
             padding: 0;
-            max-height: 600px;
+            max-height: 480px;
             overflow-y: auto;
         }
 
         .feed-items::-webkit-scrollbar {
-            width: 4px;
+            width: 6px;
         }
 
         .feed-items::-webkit-scrollbar-track {
@@ -411,15 +565,14 @@
         }
 
         .feed-items::-webkit-scrollbar-thumb {
-            background: var(--text-muted);
-            border-radius: 2px;
+            background: var(--primary-color);
+            border-radius: 3px;
         }
 
         .item {
-            padding: 20px;
-            border-bottom: 1px solid var(--border);
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-light);
             transition: all 0.2s ease;
-            position: relative;
         }
 
         .item:hover {
@@ -432,13 +585,13 @@
 
         .item-header {
             display: flex;
-            gap: 16px;
-            margin-bottom: 12px;
+            gap: 12px;
+            margin-bottom: 8px;
         }
 
         .item-thumbnail {
-            width: 72px;
-            height: 72px;
+            width: 60px;
+            height: 60px;
             background: var(--background);
             border-radius: var(--radius-md);
             overflow: hidden;
@@ -463,7 +616,7 @@
         }
 
         .item-title {
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 600;
             color: var(--text-primary);
             text-decoration: none;
@@ -474,24 +627,34 @@
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
-            transition: color 0.2s ease;
         }
 
         .item-title:hover {
             color: var(--primary-color);
         }
 
+        .item-source {
+            color: var(--accent-color);
+            font-size: 12px;
+            font-weight: 600;
+            background: rgba(14, 165, 233, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+            display: inline-block;
+            margin-bottom: 4px;
+        }
+
         .item-date {
             color: var(--text-muted);
-            font-size: 13px;
-            margin-bottom: 8px;
-            font-weight: 500;
+            font-size: 12px;
+            margin-bottom: 6px;
+            font-weight: 400;
         }
 
         .item-description {
             color: var(--text-secondary);
-            font-size: 14px;
-            line-height: 1.5;
+            font-size: 13px;
+            line-height: 1.4;
             overflow: hidden;
             display: -webkit-box;
             -webkit-line-clamp: 2;
@@ -499,59 +662,27 @@
         }
 
         .load-more {
-            padding: 20px;
+            padding: 16px 20px;
             text-align: center;
-            background: var(--surface-hover);
+            background: linear-gradient(135deg, var(--surface-hover), var(--background));
             border: none;
             width: 100%;
             cursor: pointer;
             color: var(--primary-color);
             font-weight: 600;
-            font-size: 15px;
+            font-size: 14px;
             transition: all 0.2s ease;
-            border-top: 1px solid var(--border);
+            border-top: 1px solid var(--border-light);
         }
 
         .load-more:hover:not(:disabled) {
-            background: var(--primary-color);
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
             color: white;
         }
 
         .load-more:disabled {
             color: var(--text-muted);
             cursor: not-allowed;
-        }
-
-        /* Mobile specific adjustments */
-        @media (max-width: 767px) {
-            .item-header {
-                flex-direction: column;
-            }
-            
-            .item-thumbnail {
-                width: 100%;
-                height: 140px;
-            }
-            
-            .feed-section:hover {
-                transform: none;
-            }
-        }
-
-        /* Add subtle animations */
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .feed-section {
-            animation: fadeIn 0.5s ease-out;
         }
 
         /* Status indicators */
@@ -561,16 +692,16 @@
             height: 8px;
             border-radius: 50%;
             margin-right: 8px;
+            animation: pulse 2s infinite;
         }
 
         .status-active {
             background: var(--success-color);
-            animation: pulse 2s infinite;
         }
 
         @keyframes pulse {
             0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+            50% { opacity: 0.6; }
         }
     </style>
 </head>
@@ -585,7 +716,7 @@
             <div class="input-group">
                 <input type="url" id="feedUrl" placeholder="Enter RSS feed URL or YouTube channel URL...">
                 <button class="btn btn-primary" onclick="addFeed()">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="12" cy="12" r="10"></circle>
                         <line x1="12" y1="8" x2="12" y2="16"></line>
                         <line x1="8" y1="12" x2="16" y2="12"></line>
@@ -614,6 +745,16 @@
 
         <div id="error" class="error" style="display: none;"></div>
 
+        <!-- Latest News Section -->
+        <div class="latest-news-section" id="latestNewsSection" style="display: none;">
+            <div class="latest-news-header">
+                <h2>Latest News</h2>
+            </div>
+            <div class="latest-news-items" id="latestNewsItems">
+                <!-- Latest news items will be populated here -->
+            </div>
+        </div>
+
         <div class="feeds-container" id="feedsContainer"></div>
     </div>
 
@@ -627,6 +768,7 @@
         // Storage for feeds
         let savedFeeds = JSON.parse(localStorage.getItem('rssFeeds') || '[]');
         let activeFeedData = new Map();
+        let allFeedItems = [];
 
         // Initialize on load
         document.addEventListener('DOMContentLoaded', function() {
@@ -663,25 +805,53 @@
                     feedData = await processRSSFeed(url);
                 }
 
-                // Save to storage
+                // Determine display name for feed
+                let displayName = feedData.title;
+                if (feedData.type === 'YouTube' && feedData.channelHandle) {
+                    displayName = `@${feedData.channelHandle}`;
+                } else if (feedData.type === 'YouTube' && feedData.channelName) {
+                    displayName = feedData.channelName;
+                } else if (feedData.domain && feedData.domain !== 'YouTube') {
+                    displayName = feedData.domain;
+                }
+
+                console.log('Channel info:', {
+                    channelHandle: feedData.channelHandle,
+                    channelName: feedData.channelName,
+                    title: feedData.title,
+                    displayName: displayName
+                });
+
+                // Save to storage with custom name
                 const feedInfo = {
                     url: url,
                     title: feedData.title,
+                    customName: displayName,
                     type: feedData.type,
                     domain: feedData.domain || extractDomain(url),
                     channelHandle: feedData.channelHandle || null,
+                    channelName: feedData.channelName || null,
                     addedAt: new Date().toISOString()
                 };
                 
                 savedFeeds.push(feedInfo);
                 localStorage.setItem('rssFeeds', JSON.stringify(savedFeeds));
                 
-                // Store feed data
-                activeFeedData.set(url, { ...feedData, offset: 5 });
+                // Store feed data (reduced to 3 items)
+                activeFeedData.set(url, { ...feedData, offset: 3 });
                 
-                // Display feed
-                displayFeed(feedInfo, feedData.items.slice(0, 5));
+                // Add items to global array for latest news
+                const itemsWithSource = feedData.items.map(item => ({
+                    ...item,
+                    sourceName: displayName,
+                    sourceUrl: url
+                }));
+                allFeedItems.push(...itemsWithSource);
+                
+                // Display feed (show 3 items)
+                displayFeed(feedInfo, feedData.items.slice(0, 3));
                 updateSavedFeedsDisplay();
+                updateLatestNews();
                 
                 // Clear input
                 document.getElementById('feedUrl').value = '';
@@ -699,19 +869,102 @@
             localStorage.setItem('rssFeeds', JSON.stringify(savedFeeds));
             activeFeedData.delete(url);
             
+            // Remove items from global array
+            allFeedItems = allFeedItems.filter(item => item.sourceUrl !== url);
+            
             const feedElement = document.querySelector(`[data-feed-url="${encodeURIComponent(url)}"]`);
             if (feedElement) {
-                feedElement.style.animation = 'fadeOut 0.3s ease-out';
-                setTimeout(() => feedElement.remove(), 300);
+                feedElement.remove();
             }
             
             updateSavedFeedsDisplay();
+            updateLatestNews();
+        }
+
+        function editFeedName(url) {
+            const feed = savedFeeds.find(f => f.url === url);
+            if (!feed) {
+                console.error('Feed not found for URL:', url);
+                return;
+            }
+            
+            const titleElement = document.querySelector(`[data-feed-url="${encodeURIComponent(url)}"] .feed-title`);
+            if (!titleElement) {
+                console.error('Title element not found for URL:', url);
+                return;
+            }
+            
+            const currentName = feed.customName || 'Unnamed Feed';
+            
+            // Create input field
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.value = currentName;
+            input.className = 'feed-title-input';
+            input.style.width = Math.max(120, currentName.length * 8) + 'px';
+            
+            // Store original element reference
+            const originalElement = titleElement;
+            
+            // Replace title with input
+            originalElement.style.display = 'none';
+            originalElement.parentNode.insertBefore(input, originalElement.nextSibling);
+            input.focus();
+            input.select();
+            
+            function saveEdit() {
+                const newName = input.value.trim() || currentName;
+                
+                // Update saved feed
+                feed.customName = newName;
+                localStorage.setItem('rssFeeds', JSON.stringify(savedFeeds));
+                
+                // Update items in global array
+                allFeedItems.forEach(item => {
+                    if (item.sourceUrl === url) {
+                        item.sourceName = newName;
+                    }
+                });
+                
+                // Update the original element
+                originalElement.textContent = newName;
+                originalElement.style.display = '';
+                
+                // Remove input
+                if (input.parentNode) {
+                    input.parentNode.removeChild(input);
+                }
+                
+                updateSavedFeedsDisplay();
+                updateLatestNews();
+            }
+            
+            function cancelEdit() {
+                originalElement.style.display = '';
+                if (input.parentNode) {
+                    input.parentNode.removeChild(input);
+                }
+            }
+            
+            input.addEventListener('blur', saveEdit);
+            input.addEventListener('keydown', (e) => {
+                e.stopPropagation(); // Prevent event bubbling
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    saveEdit();
+                }
+                if (e.key === 'Escape') {
+                    e.preventDefault();
+                    cancelEdit();
+                }
+            });
         }
 
         async function loadSavedFeeds() {
             if (savedFeeds.length === 0) return;
             
             showLoading();
+            allFeedItems = [];
             
             for (const feedInfo of savedFeeds) {
                 try {
@@ -722,14 +975,69 @@
                         feedData = await processRSSFeed(feedInfo.url);
                     }
                     
-                    activeFeedData.set(feedInfo.url, { ...feedData, offset: 5 });
-                    displayFeed(feedInfo, feedData.items.slice(0, 5));
+                    activeFeedData.set(feedInfo.url, { ...feedData, offset: 3 });
+                    
+                    // Add items to global array for latest news
+                    const itemsWithSource = feedData.items.map(item => ({
+                        ...item,
+                        sourceName: feedInfo.customName || feedInfo.domain || 'Unknown Source',
+                        sourceUrl: feedInfo.url
+                    }));
+                    allFeedItems.push(...itemsWithSource);
+                    
+                    displayFeed(feedInfo, feedData.items.slice(0, 3));
                 } catch (error) {
                     console.error('Error loading saved feed:', feedInfo.url, error);
                 }
             }
             
+            updateLatestNews();
             hideLoading();
+        }
+
+        function updateLatestNews() {
+            const latestNewsSection = document.getElementById('latestNewsSection');
+            const latestNewsItems = document.getElementById('latestNewsItems');
+            
+            if (allFeedItems.length === 0) {
+                latestNewsSection.style.display = 'none';
+                return;
+            }
+            
+            // Sort all items by date (newest first) and take top 10
+            const sortedItems = allFeedItems
+                .sort((a, b) => new Date(b.rawDate || b.pubDate) - new Date(a.rawDate || a.pubDate))
+                .slice(0, 10);
+            
+            latestNewsItems.innerHTML = '';
+            
+            sortedItems.forEach(item => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'latest-news-item';
+                
+                // Ensure we have a valid source name, fallback to a generic name if undefined
+                const sourceName = item.sourceName && item.sourceName !== 'undefined' ? item.sourceName : 'News Source';
+                
+                itemDiv.innerHTML = `
+                    ${item.thumbnail ? `
+                        <div class="latest-news-thumbnail">
+                            <img src="${item.thumbnail}" alt="Thumbnail" onerror="this.parentElement.style.display='none'" loading="lazy">
+                        </div>
+                    ` : ''}
+                    <div class="latest-news-content">
+                        <a href="${item.link}" class="latest-news-title" target="_blank" rel="noopener noreferrer">${item.title}</a>
+                        <div class="latest-news-meta">
+                            <span class="latest-news-source">${sourceName}</span>
+                            <span>•</span>
+                            <span>${item.pubDate}</span>
+                        </div>
+                    </div>
+                `;
+                
+                latestNewsItems.appendChild(itemDiv);
+            });
+            
+            latestNewsSection.style.display = 'block';
         }
 
         function extractDomain(url) {
@@ -768,7 +1076,7 @@
             savedFeedsList.innerHTML = '';
             
             savedFeeds.forEach(feed => {
-                const displayName = feed.channelHandle ? `@${feed.channelHandle}` : feed.domain;
+                const displayName = feed.customName || feed.domain;
                 const feedItem = document.createElement('div');
                 feedItem.className = 'saved-feed-item';
                 feedItem.innerHTML = `
@@ -785,48 +1093,111 @@
         }
 
         async function processYouTubeFeed(url) {
+            console.log('Processing YouTube URL:', url);
+            
             // Extract channel info from URL
             const channelInfo = await extractYouTubeChannelInfo(url);
             if (!channelInfo.channelId) {
                 throw new Error('Could not extract YouTube channel ID from URL');
             }
 
+            console.log('Channel info extracted:', channelInfo);
+
+            // Try standard channel RSS first
             const rssUrl = YOUTUBE_RSS_BASE + channelInfo.channelId;
+            console.log('Trying RSS URL:', rssUrl);
+            
             const feedData = await processRSSFeed(rssUrl, 'YouTube');
             
-            // Add channel handle and update domain
+            // Add channel info to feed data
             feedData.channelHandle = channelInfo.handle;
-            feedData.domain = channelInfo.handle ? `@${channelInfo.handle}` : 'YouTube';
+            feedData.channelName = channelInfo.channelName;
+            feedData.domain = channelInfo.handle ? `@${channelInfo.handle}` : (channelInfo.channelName || 'YouTube');
             
-            // Filter out YouTube Shorts (videos under 60 seconds or with #shorts)
-            feedData.items = feedData.items.filter(item => {
-                // Filter out shorts based on title/description patterns
-                const text = (item.title + ' ' + item.description).toLowerCase();
-                return !text.includes('#shorts') && 
-                       !text.includes('#short') && 
-                       !item.title.toLowerCase().includes('shorts');
+            console.log('Processed YouTube feed data:', {
+                channelHandle: feedData.channelHandle,
+                channelName: feedData.channelName,
+                domain: feedData.domain,
+                title: feedData.title,
+                itemCount: feedData.items.length
             });
+            
+            // Basic filtering for YouTube content
+            feedData.items = feedData.items.filter(item => {
+                const title = item.title.toLowerCase();
+                
+                // Filter out shorts
+                const shortsKeywords = ['#shorts', '#short'];
+                const hasShortKeywords = shortsKeywords.some(keyword => title.includes(keyword));
+                
+                return !hasShortKeywords && title.length > 10;
+            });
+            
+            console.log('After filtering:', feedData.items.length, 'items remain');
             
             return feedData;
         }
 
         async function extractYouTubeChannelInfo(url) {
+            console.log('Extracting channel info from:', url);
+            
             // Handle direct channel ID URLs
             const channelMatch = url.match(/youtube\.com\/channel\/([a-zA-Z0-9_-]+)/);
             if (channelMatch) {
-                return { channelId: channelMatch[1], handle: null };
+                console.log('Found direct channel ID:', channelMatch[1]);
+                return { channelId: channelMatch[1], handle: null, channelName: null };
             }
 
-            // Handle @username URLs - we need to resolve these
+            // Handle @username URLs
             const handleMatch = url.match(/youtube\.com\/@([a-zA-Z0-9_.-]+)/);
             if (handleMatch) {
                 const handle = handleMatch[1];
+                console.log('Found handle:', handle);
                 try {
                     const response = await fetch(CORS_PROXY + encodeURIComponent(url));
                     const html = await response.text();
-                    const channelIdMatch = html.match(/"channelId":"([^"]+)"/);
+                    
+                    // Multiple methods to extract channel ID
+                    let channelIdMatch = html.match(/"externalId":"(UC[a-zA-Z0-9_-]{22})"/);
+                    if (!channelIdMatch) {
+                        channelIdMatch = html.match(/"channelId":"(UC[a-zA-Z0-9_-]{22})"/);
+                    }
+                    if (!channelIdMatch) {
+                        channelIdMatch = html.match(/channel_id=([a-zA-Z0-9_-]+)/);
+                    }
+                    if (!channelIdMatch) {
+                        channelIdMatch = html.match(/"browseId":"(UC[a-zA-Z0-9_-]{22})"/);
+                    }
+                    if (!channelIdMatch) {
+                        channelIdMatch = html.match(/property="og:url" content="https:\/\/www\.youtube\.com\/channel\/(UC[a-zA-Z0-9_-]{22})"/);
+                    }
+                    
+                    // Extract channel name
+                    let channelName = null;
+                    const titleMatch = html.match(/<title>([^<]+)<\/title>/);
+                    if (titleMatch && titleMatch[1]) {
+                        channelName = titleMatch[1].replace(' - YouTube', '').trim();
+                    }
+                    
+                    if (!channelName) {
+                        const metaMatch = html.match(/<meta property="og:title" content="([^"]+)"/);
+                        if (metaMatch && metaMatch[1]) {
+                            channelName = metaMatch[1].trim();
+                        }
+                    }
+                    
+                    console.log('Extracted from @handle:', {
+                        channelId: channelIdMatch ? channelIdMatch[1] : null,
+                        handle: handle,
+                        channelName: channelName
+                    });
+                    
                     if (channelIdMatch) {
-                        return { channelId: channelIdMatch[1], handle: handle };
+                        return { 
+                            channelId: channelIdMatch[1], 
+                            handle: handle,
+                            channelName: channelName
+                        };
                     }
                 } catch (e) {
                     console.error('Error resolving YouTube handle:', e);
@@ -836,29 +1207,49 @@
             // Handle legacy user URLs
             const userMatch = url.match(/youtube\.com\/user\/([a-zA-Z0-9_-]+)/);
             if (userMatch) {
+                console.log('Found user URL:', userMatch[1]);
                 try {
                     const response = await fetch(CORS_PROXY + encodeURIComponent(url));
                     const html = await response.text();
-                    const channelIdMatch = html.match(/"channelId":"([^"]+)"/);
+                    const channelIdMatch = html.match(/"channelId":"(UC[a-zA-Z0-9_-]{22})"/);
                     if (channelIdMatch) {
-                        return { channelId: channelIdMatch[1], handle: userMatch[1] };
+                        return { channelId: channelIdMatch[1], handle: userMatch[1], channelName: null };
                     }
                 } catch (e) {
                     console.error('Error resolving YouTube user:', e);
                 }
             }
 
-            return { channelId: null, handle: null };
+            // Handle /c/ URLs (community URLs)
+            const cMatch = url.match(/youtube\.com\/c\/([a-zA-Z0-9_-]+)/);
+            if (cMatch) {
+                console.log('Found /c/ URL:', cMatch[1]);
+                try {
+                    const response = await fetch(CORS_PROXY + encodeURIComponent(url));
+                    const html = await response.text();
+                    const channelIdMatch = html.match(/"channelId":"(UC[a-zA-Z0-9_-]{22})"/);
+                    if (channelIdMatch) {
+                        return { channelId: channelIdMatch[1], handle: cMatch[1], channelName: null };
+                    }
+                } catch (e) {
+                    console.error('Error resolving YouTube /c/ URL:', e);
+                }
+            }
+
+            throw new Error('Could not extract YouTube channel ID from URL');
         }
 
         async function processRSSFeed(url, feedTypeOverride = null) {
             try {
+                console.log('Fetching RSS feed:', url);
                 const response = await fetch(CORS_PROXY + encodeURIComponent(url));
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
 
                 const xmlText = await response.text();
+                console.log('Got XML response, length:', xmlText.length);
+                
                 const parser = new DOMParser();
                 const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
 
@@ -871,6 +1262,7 @@
                 // Determine feed type and parse accordingly
                 const isAtom = xmlDoc.querySelector('feed');
                 const feedType = feedTypeOverride || (isAtom ? 'Atom' : 'RSS');
+                console.log('Feed type:', feedType, 'isAtom:', !!isAtom);
 
                 let feedTitle, items;
 
@@ -882,6 +1274,8 @@
                     items = parseRSSItems(xmlDoc);
                 }
 
+                console.log('Parsed feed:', feedTitle, 'with', items.length, 'items');
+
                 return {
                     title: feedTitle,
                     type: feedType,
@@ -889,6 +1283,7 @@
                 };
                 
             } catch (error) {
+                console.error('RSS processing error:', error);
                 throw new Error(`Failed to fetch or parse feed: ${error.message}`);
             }
         }
@@ -896,6 +1291,7 @@
         function parseRSSItems(xmlDoc) {
             const items = [];
             const itemElements = xmlDoc.querySelectorAll('item');
+            console.log('Found', itemElements.length, 'RSS items');
 
             for (let i = 0; i < itemElements.length; i++) {
                 const item = itemElements[i];
@@ -926,6 +1322,7 @@
                     description: cleanText(description),
                     link: link,
                     pubDate: formatDate(pubDate),
+                    rawDate: pubDate,
                     thumbnail: thumbnail
                 });
             }
@@ -936,6 +1333,7 @@
         function parseAtomItems(xmlDoc) {
             const items = [];
             const entryElements = xmlDoc.querySelectorAll('entry');
+            console.log('Found', entryElements.length, 'Atom entries');
 
             for (let i = 0; i < entryElements.length; i++) {
                 const entry = entryElements[i];
@@ -943,7 +1341,19 @@
                 const title = entry.querySelector('title')?.textContent || 'No Title';
                 const summary = entry.querySelector('summary')?.textContent || 
                               entry.querySelector('content')?.textContent || 'No description';
-                const link = entry.querySelector('link')?.getAttribute('href') || '';
+                
+                // Properly get the YouTube video link
+                let link = '';
+                const linkElement = entry.querySelector('link[rel="alternate"]');
+                if (linkElement) {
+                    link = linkElement.getAttribute('href');
+                } else {
+                    const anyLink = entry.querySelector('link');
+                    if (anyLink) {
+                        link = anyLink.getAttribute('href');
+                    }
+                }
+                
                 const published = entry.querySelector('published')?.textContent || 
                                 entry.querySelector('updated')?.textContent || '';
 
@@ -954,11 +1364,18 @@
                     thumbnail = mediaThumb.getAttribute('url');
                 }
 
+                console.log('Atom item:', {
+                    title: title.substring(0, 50),
+                    link: link.substring(0, 50),
+                    hasThumbnail: !!thumbnail
+                });
+
                 items.push({
                     title: cleanText(title),
                     description: cleanText(summary),
                     link: link,
                     pubDate: formatDate(published),
+                    rawDate: published,
                     thumbnail: thumbnail
                 });
             }
@@ -1004,16 +1421,28 @@
             feedDiv.className = 'feed-section';
             feedDiv.setAttribute('data-feed-url', encodeURIComponent(feedInfo.url));
             
-            const displayTitle = feedInfo.channelHandle ? `@${feedInfo.channelHandle}` : feedInfo.domain;
-            const headerClass = feedInfo.type === 'YouTube' ? 'youtube-type' : 'rss-type';
+            const displayTitle = feedInfo.customName || feedInfo.domain;
             
             feedDiv.innerHTML = `
-                <div class="feed-header">
-                    <div class="feed-header-content">
-                        <div class="feed-title">${displayTitle}</div>
-                        <span class="feed-type ${headerClass}">${feedInfo.type}</span>
+                <div class="feed-header ${feedInfo.type === 'YouTube' ? 'youtube-header' : ''}">
+                    <div class="feed-header-left">
+                        <h3 class="feed-title">${displayTitle}</h3>
+                        <span class="feed-type ${feedInfo.type === 'YouTube' ? 'youtube-type' : 'rss-type'}">${feedInfo.type}</span>
                     </div>
-                    <button class="feed-close" onclick="removeFeed('${feedInfo.url}')" title="Remove feed">×</button>
+                    <div class="feed-actions">
+                        <button class="feed-edit-btn" onclick="editFeedName('${feedInfo.url}')" title="Edit name">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                <path d="m18.5 2.5 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                            </svg>
+                        </button>
+                        <button class="feed-close" onclick="removeFeed('${feedInfo.url}')" title="Remove feed">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        </button>
+                    </div>
                 </div>
                 <div class="feed-items" id="items-${encodeURIComponent(feedInfo.url)}">
                     ${items.map(item => `
@@ -1025,11 +1454,12 @@
                                     </div>
                                 ` : ''}
                                 <div class="item-content">
+                                    <div class="item-source">${displayTitle}</div>
                                     <a href="${item.link}" class="item-title" target="_blank" rel="noopener noreferrer">${item.title}</a>
                                     <div class="item-date">${item.pubDate}</div>
                                 </div>
                             </div>
-                            <div class="item-description">${item.description.substring(0, 150)}${item.description.length > 150 ? '...' : ''}</div>
+                            <div class="item-description">${item.description.substring(0, 120)}${item.description.length > 120 ? '...' : ''}</div>
                         </div>
                     `).join('')}
                 </div>
@@ -1041,14 +1471,15 @@
 
         async function loadMoreItems(feedUrl) {
             const feedData = activeFeedData.get(feedUrl);
-            if (!feedData) return;
+            const feedInfo = savedFeeds.find(f => f.url === feedUrl);
+            if (!feedData || !feedInfo) return;
             
             const button = event.target;
             const originalText = button.textContent;
             button.textContent = 'Loading...';
             button.disabled = true;
             
-            const nextItems = feedData.items.slice(feedData.offset, feedData.offset + 5);
+            const nextItems = feedData.items.slice(feedData.offset, feedData.offset + 3);
             
             if (nextItems.length === 0) {
                 button.textContent = 'No more items';
@@ -1069,11 +1500,12 @@
                             </div>
                         ` : ''}
                         <div class="item-content">
+                            <div class="item-source">${feedInfo.customName || feedInfo.domain}</div>
                             <a href="${item.link}" class="item-title" target="_blank" rel="noopener noreferrer">${item.title}</a>
                             <div class="item-date">${item.pubDate}</div>
                         </div>
                     </div>
-                    <div class="item-description">${item.description.substring(0, 150)}${item.description.length > 150 ? '...' : ''}</div>
+                    <div class="item-description">${item.description.substring(0, 120)}${item.description.length > 120 ? '...' : ''}</div>
                 `;
                 itemsContainer.appendChild(itemDiv);
                 
@@ -1084,7 +1516,7 @@
                 }, 10);
             });
             
-            feedData.offset += 5;
+            feedData.offset += 3;
             
             button.textContent = originalText;
             button.disabled = false;
@@ -1122,22 +1554,6 @@
                 addFeed();
             }
         });
-
-        // Add CSS for fade out animation
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes fadeOut {
-                from {
-                    opacity: 1;
-                    transform: translateY(0);
-                }
-                to {
-                    opacity: 0;
-                    transform: translateY(-20px);
-                }
-            }
-        `;
-        document.head.appendChild(style);
     </script>
 </body>
 </html>
