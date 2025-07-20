@@ -703,6 +703,25 @@
             0%, 100% { opacity: 1; }
             50% { opacity: 0.6; }
         }
+
+        /* Debug section styles */
+        .debug-controls {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+
+        .storage-info {
+            margin-top: 16px;
+            padding: 16px;
+            background: var(--background);
+            border-radius: var(--radius-lg);
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            line-height: 1.4;
+            border: 1px solid var(--border);
+        }
     </style>
 </head>
 <body>
@@ -739,6 +758,19 @@
             </div>
         </div>
 
+        <!-- Debug Section -->
+        <div class="input-section" id="debugSection" style="display: none;">
+            <h3>Storage Debug & Backup Tools</h3>
+            <div class="debug-controls">
+                <button class="btn btn-secondary" onclick="showStorageDebug()">Show Storage Info</button>
+                <button class="btn btn-secondary" onclick="exportFeeds()">Export Feeds</button>
+                <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()">Import Feeds</button>
+                <button class="btn btn-secondary" onclick="toggleDebugSection()">Hide Debug</button>
+            </div>
+            <input type="file" id="importFile" style="display: none;" accept=".json" onchange="importFeeds(event)">
+            <div id="storageInfo" class="storage-info" style="display: none;"></div>
+        </div>
+
         <div id="loading" class="loading" style="display: none;">
             Loading feed...
         </div>
@@ -756,6 +788,13 @@
         </div>
 
         <div class="feeds-container" id="feedsContainer"></div>
+        
+        <!-- Debug Toggle Button (always visible) -->
+        <div style="position: fixed; bottom: 20px; right: 20px;">
+            <button class="btn btn-secondary" onclick="toggleDebugSection()" style="opacity: 0.7;">
+                🔧 Debug
+            </button>
+        </div>
     </div>
 
     <script>
@@ -765,8 +804,188 @@
         // YouTube RSS feed format (doesn't require API key)
         const YOUTUBE_RSS_BASE = 'https://www.youtube.com/feeds/videos.xml?channel_id=';
         
+        // Enhanced storage management
+        class FeedStorage {
+            constructor() {
+                this.storageKey = 'rssFeeds';
+                this.backupKey = 'rssFeedsBackup';
+                this.syncKey = 'feedsLastSync';
+            }
+
+            // Save feeds with backup
+            save(feeds) {
+                try {
+                    const data = {
+                        feeds: feeds,
+                        timestamp: new Date().toISOString(),
+                        userAgent: navigator.userAgent,
+                        url: window.location.href
+                    };
+                    
+                    localStorage.setItem(this.storageKey, JSON.stringify(feeds));
+                    localStorage.setItem(this.backupKey, JSON.stringify(data));
+                    localStorage.setItem(this.syncKey, new Date().getTime().toString());
+                    
+                    // Also try sessionStorage as backup
+                    try {
+                        sessionStorage.setItem(this.storageKey, JSON.stringify(feeds));
+                    } catch (e) {
+                        console.warn('SessionStorage not available:', e);
+                    }
+                    
+                    console.log('Feeds saved:', feeds.length, 'items');
+                    return true;
+                } catch (error) {
+                    console.error('Error saving feeds:', error);
+                    this.showStorageError('Failed to save feeds');
+                    return false;
+                }
+            }
+
+            // Load feeds with fallback options
+            load() {
+                let feeds = [];
+                
+                try {
+                    // Try localStorage first
+                    const stored = localStorage.getItem(this.storageKey);
+                    if (stored) {
+                        feeds = JSON.parse(stored);
+                        console.log('Loaded from localStorage:', feeds.length, 'feeds');
+                    }
+                    
+                    // If no feeds, try sessionStorage
+                    if (feeds.length === 0) {
+                        try {
+                            const sessionStored = sessionStorage.getItem(this.storageKey);
+                            if (sessionStored) {
+                                feeds = JSON.parse(sessionStored);
+                                console.log('Loaded from sessionStorage:', feeds.length, 'feeds');
+                                // Re-save to localStorage
+                                this.save(feeds);
+                            }
+                        } catch (e) {
+                            console.warn('SessionStorage read failed:', e);
+                        }
+                    }
+                    
+                    // If still no feeds, try backup
+                    if (feeds.length === 0) {
+                        const backup = localStorage.getItem(this.backupKey);
+                        if (backup) {
+                            const backupData = JSON.parse(backup);
+                            feeds = backupData.feeds || [];
+                            console.log('Loaded from backup:', feeds.length, 'feeds');
+                            // Re-save to localStorage
+                            this.save(feeds);
+                        }
+                    }
+                    
+                } catch (error) {
+                    console.error('Error loading feeds:', error);
+                    this.showStorageError('Failed to load saved feeds');
+                }
+                
+                // Validate feeds array
+                if (!Array.isArray(feeds)) {
+                    console.warn('Invalid feeds data, resetting');
+                    feeds = [];
+                }
+                
+                return feeds;
+            }
+
+            // Check storage availability
+            isStorageAvailable() {
+                try {
+                    const test = '__storage_test__';
+                    localStorage.setItem(test, test);
+                    localStorage.removeItem(test);
+                    return true;
+                } catch (e) {
+                    return false;
+                }
+            }
+
+            // Get storage info for debugging
+            getStorageInfo() {
+                const info = {
+                    localStorage: this.isStorageAvailable(),
+                    sessionStorage: false,
+                    feeds: 0,
+                    lastSync: null,
+                    url: window.location.href,
+                    userAgent: navigator.userAgent.substring(0, 100)
+                };
+                
+                try {
+                    sessionStorage.setItem('test', 'test');
+                    sessionStorage.removeItem('test');
+                    info.sessionStorage = true;
+                } catch (e) {
+                    // sessionStorage not available
+                }
+                
+                try {
+                    const stored = localStorage.getItem(this.storageKey);
+                    if (stored) {
+                        info.feeds = JSON.parse(stored).length;
+                    }
+                    
+                    const syncTime = localStorage.getItem(this.syncKey);
+                    if (syncTime) {
+                        info.lastSync = new Date(parseInt(syncTime)).toLocaleString();
+                    }
+                } catch (e) {
+                    console.error('Error getting storage info:', e);
+                }
+                
+                return info;
+            }
+
+            showStorageError(message) {
+                const errorDiv = document.getElementById('error');
+                if (errorDiv) {
+                    errorDiv.innerHTML = `
+                        <strong>Storage Issue:</strong> ${message}<br>
+                        <small>Try refreshing the page or clearing browser data</small>
+                    `;
+                    errorDiv.style.display = 'block';
+                }
+            }
+
+            // Export feeds as JSON for manual backup
+            exportFeeds() {
+                const feeds = this.load();
+                const data = {
+                    feeds: feeds,
+                    exported: new Date().toISOString(),
+                    version: '1.0'
+                };
+                return JSON.stringify(data, null, 2);
+            }
+
+            // Import feeds from JSON
+            importFeeds(jsonData) {
+                try {
+                    const data = JSON.parse(jsonData);
+                    if (data.feeds && Array.isArray(data.feeds)) {
+                        this.save(data.feeds);
+                        return data.feeds;
+                    } else {
+                        throw new Error('Invalid feed data format');
+                    }
+                } catch (error) {
+                    throw new Error('Failed to import feeds: ' + error.message);
+                }
+            }
+        }
+
+        // Initialize enhanced storage
+        const feedStorage = new FeedStorage();
+        
         // Storage for feeds
-        let savedFeeds = JSON.parse(localStorage.getItem('rssFeeds') || '[]');
+        let savedFeeds = feedStorage.load();
         let activeFeedData = new Map();
         let allFeedItems = [];
 
@@ -775,6 +994,59 @@
             loadSavedFeeds();
             updateSavedFeedsDisplay();
         });
+
+        // Debug and utility functions
+        function toggleDebugSection() {
+            const debugSection = document.getElementById('debugSection');
+            debugSection.style.display = debugSection.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function showStorageDebug() {
+            const info = feedStorage.getStorageInfo();
+            const infoDiv = document.getElementById('storageInfo');
+            
+            infoDiv.style.display = 'block';
+            infoDiv.innerHTML = `
+                <strong>Storage Debug Info:</strong><br>
+                localStorage Available: ${info.localStorage}<br>
+                sessionStorage Available: ${info.sessionStorage}<br>
+                Saved Feeds: ${info.feeds}<br>
+                Last Sync: ${info.lastSync || 'Never'}<br>
+                Current URL: ${info.url}<br>
+                User Agent: ${info.userAgent}...
+            `;
+        }
+
+        function exportFeeds() {
+            const data = feedStorage.exportFeeds();
+            const blob = new Blob([data], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `rss-feeds-backup-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showError('Feeds exported successfully!');
+        }
+
+        function importFeeds(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedFeeds = feedStorage.importFeeds(e.target.result);
+                    savedFeeds = importedFeeds;
+                    
+                    // Reload the page to refresh everything
+                    location.reload();
+                } catch (error) {
+                    showError('Import failed: ' + error.message);
+                }
+            };
+            reader.readAsText(file);
+        }
 
         function addQuickFeed(url) {
             document.getElementById('feedUrl').value = url;
@@ -835,7 +1107,7 @@
                 };
                 
                 savedFeeds.push(feedInfo);
-                localStorage.setItem('rssFeeds', JSON.stringify(savedFeeds));
+                feedStorage.save(savedFeeds);
                 
                 // Store feed data (reduced to 3 items)
                 activeFeedData.set(url, { ...feedData, offset: 3 });
@@ -866,7 +1138,7 @@
 
         function removeFeed(url) {
             savedFeeds = savedFeeds.filter(feed => feed.url !== url);
-            localStorage.setItem('rssFeeds', JSON.stringify(savedFeeds));
+            feedStorage.save(savedFeeds);
             activeFeedData.delete(url);
             
             // Remove items from global array
@@ -917,7 +1189,7 @@
                 
                 // Update saved feed
                 feed.customName = newName;
-                localStorage.setItem('rssFeeds', JSON.stringify(savedFeeds));
+                feedStorage.save(savedFeeds);
                 
                 // Update items in global array
                 allFeedItems.forEach(item => {
