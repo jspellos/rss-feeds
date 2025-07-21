@@ -83,6 +83,71 @@
             border: 1px solid var(--border);
         }
 
+        .sync-section {
+            background: var(--surface);
+            padding: 20px;
+            border-radius: var(--radius-xl);
+            margin-bottom: 32px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border);
+        }
+
+        .sync-section h3 {
+            margin-bottom: 12px;
+            color: var(--text-secondary);
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .sync-controls {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .sync-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .sync-status.synced {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .sync-status.syncing {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .sync-status.error {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+
+        .github-input {
+            padding: 8px 12px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            background: var(--surface);
+            color: var(--text-primary);
+            transition: all 0.2s ease;
+            font-family: 'Courier New', monospace;
+        }
+
+        .github-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgb(37 99 235 / 0.1);
+        }
+
         .input-group {
             display: flex;
             gap: 12px;
@@ -126,6 +191,11 @@
             align-items: center;
             gap: 8px;
             box-shadow: var(--shadow-md);
+        }
+
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 12px;
         }
 
         .btn-primary {
@@ -443,6 +513,11 @@
                 width: 100%;
                 height: 120px;
             }
+
+            .sync-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
         }
 
         .feed-section {
@@ -731,6 +806,41 @@
             <p>Stay updated with your favorite content sources</p>
         </div>
 
+        <!-- GitHub Sync Section -->
+        <div class="sync-section">
+            <h3>🔄 Cross-Device Sync</h3>
+            <div class="sync-controls">
+                <input type="text" id="githubUrl" class="github-input" 
+                       placeholder="GitHub raw file URL (e.g., https://raw.githubusercontent.com/user/repo/main/feeds.json)"
+                       style="flex: 1; min-width: 300px;">
+                <button class="btn btn-primary btn-small" onclick="setupGitHubSync()">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="m12 1 0 6"></path>
+                        <path d="m12 17 0 6"></path>
+                        <path d="m4.22 4.22 4.24 4.24"></path>
+                        <path d="m15.54 15.54 4.24 4.24"></path>
+                        <path d="m1 12 6 0"></path>
+                        <path d="m17 12 6 0"></path>
+                        <path d="m4.22 19.78 4.24-4.24"></path>
+                        <path d="m15.54 8.46 4.24-4.24"></path>
+                    </svg>
+                    Setup Sync
+                </button>
+                <button class="btn btn-secondary btn-small" onclick="syncNow()">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="23 4 23 10 17 10"></polyline>
+                        <polyline points="1 20 1 14 7 14"></polyline>
+                        <path d="m3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                    </svg>
+                    Sync Now
+                </button>
+            </div>
+            <div id="syncStatus" class="sync-status" style="display: none; margin-top: 12px;">
+                <span id="syncStatusText">Ready to sync</span>
+            </div>
+        </div>
+
         <div class="input-section">
             <div class="input-group">
                 <input type="url" id="feedUrl" placeholder="Enter RSS feed URL or YouTube channel URL...">
@@ -804,7 +914,159 @@
         // YouTube RSS feed format (doesn't require API key)
         const YOUTUBE_RSS_BASE = 'https://www.youtube.com/feeds/videos.xml?channel_id=';
         
-        // Enhanced storage management
+        // GitHub Sync Manager
+        class GitHubSyncManager {
+            constructor() {
+                this.githubUrl = localStorage.getItem('githubSyncUrl') || '';
+                this.lastSyncTime = parseInt(localStorage.getItem('lastSyncTime') || '0');
+                this.syncInterval = 5 * 60 * 1000; // 5 minutes
+                this.autoSyncTimer = null;
+                
+                // Load GitHub URL on startup
+                if (this.githubUrl) {
+                    document.getElementById('githubUrl').value = this.githubUrl;
+                    this.updateSyncStatus('synced', 'Sync configured');
+                    this.startAutoSync();
+                }
+            }
+
+            setupSync(githubUrl) {
+                if (!githubUrl || !githubUrl.includes('raw.githubusercontent.com')) {
+                    throw new Error('Please enter a valid GitHub raw file URL');
+                }
+                
+                this.githubUrl = githubUrl;
+                localStorage.setItem('githubSyncUrl', githubUrl);
+                
+                this.updateSyncStatus('syncing', 'Setting up sync...');
+                
+                // Start auto-sync
+                this.startAutoSync();
+                
+                // Perform initial sync
+                return this.syncWithGitHub();
+            }
+
+            async syncWithGitHub() {
+                if (!this.githubUrl) {
+                    throw new Error('GitHub sync not configured');
+                }
+
+                try {
+                    this.updateSyncStatus('syncing', 'Syncing...');
+                    
+                    // Try to fetch existing data from GitHub
+                    let remoteData = null;
+                    try {
+                        const response = await fetch(this.githubUrl + '?t=' + Date.now());
+                        if (response.ok) {
+                            const text = await response.text();
+                            if (text.trim()) {
+                                remoteData = JSON.parse(text);
+                            }
+                        }
+                    } catch (e) {
+                        console.log('No existing remote data or failed to fetch:', e.message);
+                    }
+
+                    // Get local data
+                    const localData = {
+                        feeds: savedFeeds,
+                        lastUpdated: new Date().toISOString(),
+                        deviceInfo: {
+                            userAgent: navigator.userAgent,
+                            timestamp: Date.now()
+                        }
+                    };
+
+                    // Determine which is newer and merge if needed
+                    if (remoteData && remoteData.lastUpdated) {
+                        const remoteTime = new Date(remoteData.lastUpdated).getTime();
+                        const localTime = this.lastSyncTime;
+                        
+                        if (remoteTime > localTime && remoteData.feeds) {
+                            // Remote is newer, use remote data
+                            savedFeeds = remoteData.feeds;
+                            feedStorage.save(savedFeeds);
+                            
+                            this.updateSyncStatus('synced', `Synced from remote (${remoteData.feeds.length} feeds)`);
+                            
+                            // Reload feeds
+                            await this.reloadFeeds();
+                        } else {
+                            // Local is newer or same, no action needed
+                            this.updateSyncStatus('synced', `Up to date (${savedFeeds.length} feeds)`);
+                        }
+                    } else {
+                        // No remote data exists, just update status
+                        this.updateSyncStatus('synced', `Local data only (${savedFeeds.length} feeds)`);
+                    }
+                    
+                    this.lastSyncTime = Date.now();
+                    localStorage.setItem('lastSyncTime', this.lastSyncTime.toString());
+                    
+                    return true;
+                } catch (error) {
+                    console.error('Sync error:', error);
+                    this.updateSyncStatus('error', 'Sync failed: ' + error.message);
+                    throw error;
+                }
+            }
+
+            async reloadFeeds() {
+                // Clear current feeds display
+                document.getElementById('feedsContainer').innerHTML = '';
+                allFeedItems = [];
+                activeFeedData.clear();
+                
+                // Reload saved feeds
+                updateSavedFeedsDisplay();
+                await loadSavedFeeds();
+            }
+
+            // Note: GitHub doesn't allow direct writes from browser due to CORS.
+            // This is a limitation of browser-based apps. The sync is read-only.
+            // For full sync, you'd need a backend service or GitHub App.
+            
+            startAutoSync() {
+                this.stopAutoSync();
+                this.autoSyncTimer = setInterval(() => {
+                    this.syncWithGitHub().catch(error => {
+                        console.error('Auto-sync failed:', error);
+                    });
+                }, this.syncInterval);
+            }
+
+            stopAutoSync() {
+                if (this.autoSyncTimer) {
+                    clearInterval(this.autoSyncTimer);
+                    this.autoSyncTimer = null;
+                }
+            }
+
+            updateSyncStatus(status, message) {
+                const statusElement = document.getElementById('syncStatus');
+                const statusText = document.getElementById('syncStatusText');
+                
+                statusElement.className = `sync-status ${status}`;
+                statusElement.style.display = 'flex';
+                statusText.textContent = message;
+                
+                // Auto-hide success messages after 3 seconds
+                if (status === 'synced') {
+                    setTimeout(() => {
+                        if (statusElement.className.includes('synced')) {
+                            statusElement.style.display = 'none';
+                        }
+                    }, 3000);
+                }
+            }
+        }
+
+        // Initialize GitHub sync manager
+        const githubSync = new GitHubSyncManager();
+
+        // Enhanced storage management with sync support
         class FeedStorage {
             constructor() {
                 this.storageKey = 'rssFeeds';
@@ -812,7 +1074,6 @@
                 this.syncKey = 'feedsLastSync';
             }
 
-            // Save feeds with backup
             save(feeds) {
                 try {
                     const data = {
@@ -826,7 +1087,6 @@
                     localStorage.setItem(this.backupKey, JSON.stringify(data));
                     localStorage.setItem(this.syncKey, new Date().getTime().toString());
                     
-                    // Also try sessionStorage as backup
                     try {
                         sessionStorage.setItem(this.storageKey, JSON.stringify(feeds));
                     } catch (e) {
@@ -842,26 +1102,22 @@
                 }
             }
 
-            // Load feeds with fallback options
             load() {
                 let feeds = [];
                 
                 try {
-                    // Try localStorage first
                     const stored = localStorage.getItem(this.storageKey);
                     if (stored) {
                         feeds = JSON.parse(stored);
                         console.log('Loaded from localStorage:', feeds.length, 'feeds');
                     }
                     
-                    // If no feeds, try sessionStorage
                     if (feeds.length === 0) {
                         try {
                             const sessionStored = sessionStorage.getItem(this.storageKey);
                             if (sessionStored) {
                                 feeds = JSON.parse(sessionStored);
                                 console.log('Loaded from sessionStorage:', feeds.length, 'feeds');
-                                // Re-save to localStorage
                                 this.save(feeds);
                             }
                         } catch (e) {
@@ -869,14 +1125,12 @@
                         }
                     }
                     
-                    // If still no feeds, try backup
                     if (feeds.length === 0) {
                         const backup = localStorage.getItem(this.backupKey);
                         if (backup) {
                             const backupData = JSON.parse(backup);
                             feeds = backupData.feeds || [];
                             console.log('Loaded from backup:', feeds.length, 'feeds');
-                            // Re-save to localStorage
                             this.save(feeds);
                         }
                     }
@@ -886,7 +1140,6 @@
                     this.showStorageError('Failed to load saved feeds');
                 }
                 
-                // Validate feeds array
                 if (!Array.isArray(feeds)) {
                     console.warn('Invalid feeds data, resetting');
                     feeds = [];
@@ -895,7 +1148,6 @@
                 return feeds;
             }
 
-            // Check storage availability
             isStorageAvailable() {
                 try {
                     const test = '__storage_test__';
@@ -907,13 +1159,13 @@
                 }
             }
 
-            // Get storage info for debugging
             getStorageInfo() {
                 const info = {
                     localStorage: this.isStorageAvailable(),
                     sessionStorage: false,
                     feeds: 0,
                     lastSync: null,
+                    githubSync: githubSync.githubUrl ? 'Configured' : 'Not configured',
                     url: window.location.href,
                     userAgent: navigator.userAgent.substring(0, 100)
                 };
@@ -954,7 +1206,6 @@
                 }
             }
 
-            // Export feeds as JSON for manual backup
             exportFeeds() {
                 const feeds = this.load();
                 const data = {
@@ -965,7 +1216,6 @@
                 return JSON.stringify(data, null, 2);
             }
 
-            // Import feeds from JSON
             importFeeds(jsonData) {
                 try {
                     const data = JSON.parse(jsonData);
@@ -981,6 +1231,72 @@
             }
         }
 
+        // Video thumbnail extraction utility
+        class VideoThumbnailExtractor {
+            static extractYouTubeThumbnail(videoUrl) {
+                // Extract video ID from various YouTube URL formats
+                const videoIdRegex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
+                const match = videoUrl.match(videoIdRegex);
+                
+                if (match && match[1]) {
+                    const videoId = match[1];
+                    // Use high quality thumbnail (hqdefault), fallback to medium (mqdefault) if needed
+                    return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+                }
+                
+                return null;
+            }
+
+            static extractVimeoThumbnail(videoUrl) {
+                // Extract Vimeo video ID
+                const vimeoRegex = /vimeo\.com\/(?:channels\/(?:\w+\/)?|groups\/([^\/]*)\/videos\/|album\/(\d+)\/video\/|)(\d+)(?:$|\/|\?)/;
+                const match = videoUrl.match(vimeoRegex);
+                
+                if (match && match[3]) {
+                    const videoId = match[3];
+                    // Note: Vimeo requires API call for thumbnails, this is a placeholder
+                    // In a real implementation, you'd make an API call to Vimeo
+                    return `https://vumbnail.com/${videoId}.jpg`;
+                }
+                
+                return null;
+            }
+
+            static extractThumbnailFromUrl(url) {
+                if (!url) return null;
+                
+                // YouTube
+                if (url.includes('youtube.com') || url.includes('youtu.be')) {
+                    return this.extractYouTubeThumbnail(url);
+                }
+                
+                // Vimeo
+                if (url.includes('vimeo.com')) {
+                    return this.extractVimeoThumbnail(url);
+                }
+                
+                // Add more video platforms as needed
+                return null;
+            }
+
+            static async extractThumbnailFromContent(content) {
+                if (!content) return null;
+                
+                // Look for video URLs in content
+                const urlRegex = /(https?:\/\/[^\s<>"{}|\\^`\[\]]+)/g;
+                const urls = content.match(urlRegex) || [];
+                
+                for (const url of urls) {
+                    const thumbnail = this.extractThumbnailFromUrl(url);
+                    if (thumbnail) {
+                        return thumbnail;
+                    }
+                }
+                
+                return null;
+            }
+        }
+
         // Initialize enhanced storage
         const feedStorage = new FeedStorage();
         
@@ -989,10 +1305,39 @@
         let activeFeedData = new Map();
         let allFeedItems = [];
 
+        // Sync functions
+        async function setupGitHubSync() {
+            const githubUrl = document.getElementById('githubUrl').value.trim();
+            
+            try {
+                await githubSync.setupSync(githubUrl);
+                showError('GitHub sync configured successfully!');
+            } catch (error) {
+                showError('Sync setup failed: ' + error.message);
+            }
+        }
+
+        async function syncNow() {
+            try {
+                await githubSync.syncWithGitHub();
+            } catch (error) {
+                showError('Sync failed: ' + error.message);
+            }
+        }
+
         // Initialize on load
         document.addEventListener('DOMContentLoaded', function() {
             loadSavedFeeds();
             updateSavedFeedsDisplay();
+            
+            // Try to sync on startup if configured
+            if (githubSync.githubUrl) {
+                setTimeout(() => {
+                    githubSync.syncWithGitHub().catch(error => {
+                        console.log('Initial sync failed:', error);
+                    });
+                }, 1000);
+            }
         });
 
         // Debug and utility functions
@@ -1012,6 +1357,7 @@
                 sessionStorage Available: ${info.sessionStorage}<br>
                 Saved Feeds: ${info.feeds}<br>
                 Last Sync: ${info.lastSync || 'Never'}<br>
+                GitHub Sync: ${info.githubSync}<br>
                 Current URL: ${info.url}<br>
                 User Agent: ${info.userAgent}...
             `;
@@ -1039,7 +1385,6 @@
                     const importedFeeds = feedStorage.importFeeds(e.target.result);
                     savedFeeds = importedFeeds;
                     
-                    // Reload the page to refresh everything
                     location.reload();
                 } catch (error) {
                     showError('Import failed: ' + error.message);
@@ -1060,7 +1405,6 @@
                 return;
             }
 
-            // Check if already added
             if (savedFeeds.some(feed => feed.url === url)) {
                 showError('This feed is already added');
                 return;
@@ -1077,7 +1421,6 @@
                     feedData = await processRSSFeed(url);
                 }
 
-                // Determine display name for feed
                 let displayName = feedData.title;
                 if (feedData.type === 'YouTube' && feedData.channelHandle) {
                     displayName = `@${feedData.channelHandle}`;
@@ -1087,14 +1430,6 @@
                     displayName = feedData.domain;
                 }
 
-                console.log('Channel info:', {
-                    channelHandle: feedData.channelHandle,
-                    channelName: feedData.channelName,
-                    title: feedData.title,
-                    displayName: displayName
-                });
-
-                // Save to storage with custom name
                 const feedInfo = {
                     url: url,
                     title: feedData.title,
@@ -1109,10 +1444,8 @@
                 savedFeeds.push(feedInfo);
                 feedStorage.save(savedFeeds);
                 
-                // Store feed data (reduced to 3 items)
                 activeFeedData.set(url, { ...feedData, offset: 3 });
                 
-                // Add items to global array for latest news
                 const itemsWithSource = feedData.items.map(item => ({
                     ...item,
                     sourceName: displayName,
@@ -1120,12 +1453,10 @@
                 }));
                 allFeedItems.push(...itemsWithSource);
                 
-                // Display feed (show 3 items)
                 displayFeed(feedInfo, feedData.items.slice(0, 3));
                 updateSavedFeedsDisplay();
                 updateLatestNews();
                 
-                // Clear input
                 document.getElementById('feedUrl').value = '';
                 
             } catch (error) {
@@ -1141,7 +1472,6 @@
             feedStorage.save(savedFeeds);
             activeFeedData.delete(url);
             
-            // Remove items from global array
             allFeedItems = allFeedItems.filter(item => item.sourceUrl !== url);
             
             const feedElement = document.querySelector(`[data-feed-url="${encodeURIComponent(url)}"]`);
@@ -1168,17 +1498,14 @@
             
             const currentName = feed.customName || 'Unnamed Feed';
             
-            // Create input field
             const input = document.createElement('input');
             input.type = 'text';
             input.value = currentName;
             input.className = 'feed-title-input';
             input.style.width = Math.max(120, currentName.length * 8) + 'px';
             
-            // Store original element reference
             const originalElement = titleElement;
             
-            // Replace title with input
             originalElement.style.display = 'none';
             originalElement.parentNode.insertBefore(input, originalElement.nextSibling);
             input.focus();
@@ -1187,22 +1514,18 @@
             function saveEdit() {
                 const newName = input.value.trim() || currentName;
                 
-                // Update saved feed
                 feed.customName = newName;
                 feedStorage.save(savedFeeds);
                 
-                // Update items in global array
                 allFeedItems.forEach(item => {
                     if (item.sourceUrl === url) {
                         item.sourceName = newName;
                     }
                 });
                 
-                // Update the original element
                 originalElement.textContent = newName;
                 originalElement.style.display = '';
                 
-                // Remove input
                 if (input.parentNode) {
                     input.parentNode.removeChild(input);
                 }
@@ -1220,7 +1543,7 @@
             
             input.addEventListener('blur', saveEdit);
             input.addEventListener('keydown', (e) => {
-                e.stopPropagation(); // Prevent event bubbling
+                e.stopPropagation();
                 if (e.key === 'Enter') {
                     e.preventDefault();
                     saveEdit();
@@ -1249,7 +1572,6 @@
                     
                     activeFeedData.set(feedInfo.url, { ...feedData, offset: 3 });
                     
-                    // Add items to global array for latest news
                     const itemsWithSource = feedData.items.map(item => ({
                         ...item,
                         sourceName: feedInfo.customName || feedInfo.domain || 'Unknown Source',
@@ -1276,7 +1598,6 @@
                 return;
             }
             
-            // Sort all items by date (newest first) and take top 10
             const sortedItems = allFeedItems
                 .sort((a, b) => new Date(b.rawDate || b.pubDate) - new Date(a.rawDate || a.pubDate))
                 .slice(0, 10);
@@ -1287,7 +1608,6 @@
                 const itemDiv = document.createElement('div');
                 itemDiv.className = 'latest-news-item';
                 
-                // Ensure we have a valid source name, fallback to a generic name if undefined
                 const sourceName = item.sourceName && item.sourceName !== 'undefined' ? item.sourceName : 'News Source';
                 
                 itemDiv.innerHTML = `
@@ -1316,7 +1636,6 @@
             try {
                 const domain = new URL(url).hostname.replace('www.', '');
                 
-                // Special cases for better naming
                 const domainMap = {
                     'feeds.npr.org': 'NPR',
                     'feeds.feedburner.com': 'FeedBurner',
@@ -1367,7 +1686,6 @@
         async function processYouTubeFeed(url) {
             console.log('Processing YouTube URL:', url);
             
-            // Extract channel info from URL
             const channelInfo = await extractYouTubeChannelInfo(url);
             if (!channelInfo.channelId) {
                 throw new Error('Could not extract YouTube channel ID from URL');
@@ -1375,30 +1693,19 @@
 
             console.log('Channel info extracted:', channelInfo);
 
-            // Try standard channel RSS first
             const rssUrl = YOUTUBE_RSS_BASE + channelInfo.channelId;
             console.log('Trying RSS URL:', rssUrl);
             
             const feedData = await processRSSFeed(rssUrl, 'YouTube');
             
-            // Add channel info to feed data
             feedData.channelHandle = channelInfo.handle;
             feedData.channelName = channelInfo.channelName;
             feedData.domain = channelInfo.handle ? `@${channelInfo.handle}` : (channelInfo.channelName || 'YouTube');
             
-            console.log('Processed YouTube feed data:', {
-                channelHandle: feedData.channelHandle,
-                channelName: feedData.channelName,
-                domain: feedData.domain,
-                title: feedData.title,
-                itemCount: feedData.items.length
-            });
-            
-            // Basic filtering for YouTube content
+            // Enhanced filtering for YouTube content
             feedData.items = feedData.items.filter(item => {
                 const title = item.title.toLowerCase();
                 
-                // Filter out shorts
                 const shortsKeywords = ['#shorts', '#short'];
                 const hasShortKeywords = shortsKeywords.some(keyword => title.includes(keyword));
                 
@@ -1413,14 +1720,12 @@
         async function extractYouTubeChannelInfo(url) {
             console.log('Extracting channel info from:', url);
             
-            // Handle direct channel ID URLs
             const channelMatch = url.match(/youtube\.com\/channel\/([a-zA-Z0-9_-]+)/);
             if (channelMatch) {
                 console.log('Found direct channel ID:', channelMatch[1]);
                 return { channelId: channelMatch[1], handle: null, channelName: null };
             }
 
-            // Handle @username URLs
             const handleMatch = url.match(/youtube\.com\/@([a-zA-Z0-9_.-]+)/);
             if (handleMatch) {
                 const handle = handleMatch[1];
@@ -1429,7 +1734,6 @@
                     const response = await fetch(CORS_PROXY + encodeURIComponent(url));
                     const html = await response.text();
                     
-                    // Multiple methods to extract channel ID
                     let channelIdMatch = html.match(/"externalId":"(UC[a-zA-Z0-9_-]{22})"/);
                     if (!channelIdMatch) {
                         channelIdMatch = html.match(/"channelId":"(UC[a-zA-Z0-9_-]{22})"/);
@@ -1444,7 +1748,6 @@
                         channelIdMatch = html.match(/property="og:url" content="https:\/\/www\.youtube\.com\/channel\/(UC[a-zA-Z0-9_-]{22})"/);
                     }
                     
-                    // Extract channel name
                     let channelName = null;
                     const titleMatch = html.match(/<title>([^<]+)<\/title>/);
                     if (titleMatch && titleMatch[1]) {
@@ -1476,7 +1779,6 @@
                 }
             }
 
-            // Handle legacy user URLs
             const userMatch = url.match(/youtube\.com\/user\/([a-zA-Z0-9_-]+)/);
             if (userMatch) {
                 console.log('Found user URL:', userMatch[1]);
@@ -1492,7 +1794,6 @@
                 }
             }
 
-            // Handle /c/ URLs (community URLs)
             const cMatch = url.match(/youtube\.com\/c\/([a-zA-Z0-9_-]+)/);
             if (cMatch) {
                 console.log('Found /c/ URL:', cMatch[1]);
@@ -1525,13 +1826,11 @@
                 const parser = new DOMParser();
                 const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
 
-                // Check for parsing errors
                 const parseError = xmlDoc.querySelector('parsererror');
                 if (parseError) {
                     throw new Error('Invalid XML format');
                 }
 
-                // Determine feed type and parse accordingly
                 const isAtom = xmlDoc.querySelector('feed');
                 const feedType = feedTypeOverride || (isAtom ? 'Atom' : 'RSS');
                 console.log('Feed type:', feedType, 'isAtom:', !!isAtom);
@@ -1575,8 +1874,10 @@
                 const pubDate = item.querySelector('pubDate')?.textContent || 
                               item.querySelector('dc\\:date')?.textContent || '';
                 
-                // Extract thumbnail
+                // Enhanced thumbnail extraction with video support
                 let thumbnail = '';
+                
+                // First, try standard media elements
                 const mediaThumb = item.querySelector('media\\:thumbnail');
                 const mediaThumbnail = item.querySelector('media\\:content[type*="image"]');
                 const enclosure = item.querySelector('enclosure[type*="image"]');
@@ -1587,6 +1888,14 @@
                     thumbnail = mediaThumbnail.getAttribute('url');
                 } else if (enclosure) {
                     thumbnail = enclosure.getAttribute('url');
+                } else {
+                    // Try to extract video thumbnail from URL
+                    thumbnail = VideoThumbnailExtractor.extractThumbnailFromUrl(link);
+                    
+                    // If no thumbnail from URL, try to find video links in description
+                    if (!thumbnail) {
+                        thumbnail = await VideoThumbnailExtractor.extractThumbnailFromContent(description);
+                    }
                 }
 
                 items.push({
@@ -1614,7 +1923,6 @@
                 const summary = entry.querySelector('summary')?.textContent || 
                               entry.querySelector('content')?.textContent || 'No description';
                 
-                // Properly get the YouTube video link
                 let link = '';
                 const linkElement = entry.querySelector('link[rel="alternate"]');
                 if (linkElement) {
@@ -1629,11 +1937,19 @@
                 const published = entry.querySelector('published')?.textContent || 
                                 entry.querySelector('updated')?.textContent || '';
 
-                // For YouTube feeds, extract thumbnail from media:group
+                // Enhanced thumbnail extraction for Atom feeds
                 let thumbnail = '';
                 const mediaThumb = entry.querySelector('media\\:thumbnail');
                 if (mediaThumb) {
                     thumbnail = mediaThumb.getAttribute('url');
+                } else {
+                    // Try to extract video thumbnail from URL
+                    thumbnail = VideoThumbnailExtractor.extractThumbnailFromUrl(link);
+                    
+                    // If no thumbnail from URL, try to find video links in content
+                    if (!thumbnail) {
+                        thumbnail = await VideoThumbnailExtractor.extractThumbnailFromContent(summary);
+                    }
                 }
 
                 console.log('Atom item:', {
@@ -1658,7 +1974,6 @@
         function cleanText(text) {
             if (!text) return '';
             
-            // Remove HTML tags
             const div = document.createElement('div');
             div.innerHTML = text;
             const cleaned = div.textContent || div.innerText || '';
@@ -1781,7 +2096,6 @@
                 `;
                 itemsContainer.appendChild(itemDiv);
                 
-                // Fade in animation
                 setTimeout(() => {
                     itemDiv.style.transition = 'opacity 0.3s ease';
                     itemDiv.style.opacity = '1';
@@ -1820,10 +2134,16 @@
             document.getElementById('error').style.display = 'none';
         }
 
-        // Allow Enter key to submit
         document.getElementById('feedUrl').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 addFeed();
+            }
+        });
+
+        // GitHub URL input enter key support
+        document.getElementById('githubUrl').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                setupGitHubSync();
             }
         });
     </script>
